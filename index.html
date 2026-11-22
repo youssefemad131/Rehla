@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8f1d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>رحلات الكنيسة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#faf6f3;--card:#fff;--tx:#2b1d1b;--mut:#8a7773;--bd:#e8dcd6;--pri:#b4231f;--dk:#8f1d1a;--ok:#2e7d4f;--wt:#b86e00;--chip:#f6ebe6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:Cairo,Tahoma,Arial,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+#app{padding:0 14px}
+.top{background:var(--dk);color:#fff;margin:0 -14px 14px;padding:calc(16px + env(safe-area-inset-top)) 16px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.top small{opacity:.75;font-size:13px}
+.top h2{margin:0;font-size:21px;line-height:1.3}
+.top button{background:none;border:1.5px solid #ffffff88;color:#fff;border-radius:8px;padding:7px 14px;font:inherit;font-size:14px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:16px;display:flex;justify-content:space-between;align-items:center}
+input[type=text],input[type=number],input:not([type]),select{font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--bd);border-radius:9px;width:100%;margin:5px 0;background:#fff;color:var(--tx);outline:none}
+input:focus,select:focus{border-color:var(--pri)}
+.btn{font:inherit;font-size:16px;font-weight:700;padding:12px;border:0;border-radius:9px;width:100%;margin:5px 0;background:var(--pri);color:#fff;display:block;text-align:center}
+.btn.g{background:var(--ok)}.btn.d{background:#444}.btn.s{background:var(--chip);color:var(--dk)}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
+.m{color:var(--mut);font-size:13px}.c{text-align:center;padding:18px}
+.stats{display:flex;padding:0}
+.stats div{flex:1;text-align:center;padding:12px 4px;border-inline-start:1px solid var(--bd)}
+.stats div:first-child{border:0}
+.stats b{display:block;font-size:24px;color:var(--pri)}.stats span{font-size:12.5px;color:var(--mut)}
+.bar{height:6px;background:var(--chip);border-radius:3px;margin:0 14px 14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pri)}
+.stg{display:flex;flex-wrap:wrap;gap:8px}
+.stg button{flex:1 0 76px;font:inherit;border:1.5px solid var(--bd);background:#fff;border-radius:10px;padding:8px 4px;color:var(--tx)}
+.stg button b{display:block;font-size:22px;color:var(--pri)}.stg button span{font-size:12.5px;color:var(--mut)}
+.stg button.on{background:var(--pri);border-color:var(--pri)}.stg button.on b,.stg button.on span{color:#fff}
+.pills{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pills button{flex:none;font:inherit;font-size:14px;font-weight:600;padding:7px 13px;border-radius:8px;border:1.5px solid var(--bd);background:#fff;color:var(--mut)}
+.pills button.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.kc{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.kc.ok{border-inline-start:5px solid var(--ok)}.kc.wait{border-inline-start:5px solid var(--wt)}
+.kr{display:flex;align-items:center;gap:13px}
+.kn{flex:1;font-weight:600;font-size:16px;line-height:1.35}
+.st{font-size:13px;font-weight:600;color:var(--mut)}.kc.ok .st{color:var(--ok)}.kc.wait .st{color:var(--wt)}
+.cb{-webkit-appearance:none;appearance:none;width:30px;height:30px;border:2px solid #c4b0a9;border-radius:8px;background:#fff;flex:none;margin:0;position:relative}
+.cb:checked{background:var(--pri);border-color:var(--pri)}
+.cb:checked:after{content:"";position:absolute;left:9px;top:3px;width:7px;height:14px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.ch{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--bd)}
+.ch button{font:inherit;font-size:14px;font-weight:600;padding:7px 12px;border-radius:8px;border:1.5px solid var(--bd);background:#fff;color:var(--tx)}
+.ch button.a{background:var(--wt);border-color:var(--wt);color:#fff}
+.ch button.a.g{background:var(--ok);border-color:var(--ok)}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0 8px;border-top:3px solid transparent}
+nav button.on{color:var(--pri);border-top-color:var(--pri)}
+nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.item:last-child{border:0}.item .n{flex:1;font-weight:600}
+.item input{width:84px;margin:0;padding:7px 8px;font-size:15px;text-align:center}
+.x{background:none;border:0;color:var(--pri);font-size:24px;padding:0 8px;line-height:1}
+.tag{font-size:12.5px;background:var(--chip);color:var(--dk);padding:2px 10px;border-radius:6px;font-weight:700}
+ol.nl{margin:6px 0 0;padding:0 24px 0 0}
+ol.nl li{padding:6px 0;border-bottom:1px solid var(--bd);font-weight:600}
+ol.nl li span{font-weight:400;color:var(--mut);font-size:13px;margin-inline-start:8px}
+details summary{cursor:pointer;font-weight:600;color:var(--dk);padding:6px 0}
+.mo{display:flex;gap:8px;text-align:center;margin:8px 0}
+.mo div{flex:1;background:var(--chip);border-radius:9px;padding:7px 4px;font-size:12.5px;color:var(--mut)}
+.mo b{display:block;font-size:17px;color:var(--tx)}
+.mo input{margin:2px 0 0;padding:4px;text-align:center;font-weight:700;font-size:16px}
+table.t{width:100%;border-collapse:collapse;font-size:15px}
+table.t td,table.t th{padding:8px 4px;text-align:center;border-bottom:1px solid var(--bd)}
+table.t th{color:var(--mut);font-weight:600;font-size:13px}
+.pb{flex:none;max-width:46%;font:inherit;font-size:13.5px;font-weight:700;padding:8px 10px;border-radius:8px;border:1.5px solid;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb.a{color:var(--wt);border-color:var(--wt);background:#fff7e8}
+.pb.g{color:var(--ok);border-color:var(--ok);background:#eaf6ee}
+.opt{display:flex;justify-content:space-between;align-items:center;width:100%;font:inherit;font-size:17px;font-weight:600;padding:15px 14px;margin-bottom:8px;border:1.5px solid var(--bd);border-radius:10px;background:#fff;color:var(--tx);text-align:start}
+.opt.cur{border-color:var(--pri);background:var(--chip);color:var(--dk)}
+.opt b{color:var(--pri)}
+.item select{width:132px;margin:0;padding:7px 6px;font-size:14px}
+#md{position:fixed;inset:0;background:#0008;z-index:30;display:none;align-items:flex-end}
+#md.on{display:flex}
+#md .sh{background:var(--bg);width:100%;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}
+#pa{display:none}
+@media print{
+ body.pr>*:not(#pa){display:none!important}
+ body.pr #pa{display:block;color:#000;background:#fff}
+ body.pr{background:#fff;padding:0}
+ #pa table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+ #pa td,#pa th{border:1px solid #444;padding:7px;text-align:right}
+ #pa th{background:#eee}
+ @page{size:A4;margin:14mm}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="nv"></nav>
+<div id="md"></div>
+<div id="pa"></div>
+<script>
+const K='churchTripsV1';
+let D;try{D=JSON.parse(localStorage.getItem(K)||'null')}catch(e){D=null}
+if(!D)D={trips:[],cur:null,kids:[],sv:[{id:'me',name:'يوسف عماد'}]};
+D.trips.forEach(t=>{t.subs=t.subs||{};t.got=t.got||{};for(const k in t.subs){const v=t.subs[k];if(typeof v==='string')t.subs[k]={paid:!!v,sv:v}}});
+const me0=D.sv.find(x=>x.id==='me');if(me0&&me0.name==='يوسف (أنا)')me0.name='يوسف عماد';
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(D))}catch(e){}};
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const T=()=>D.trips.find(t=>t.id===D.cur);
+const svName=id=>{const s=D.sv.find(x=>x.id===id);return s?s.name:'—'};
+const fm=n=>(Math.round(n*100)/100).toLocaleString('ar-EG');
+const GR=['حضانة','أولى ابتدائي','تانية ابتدائي','تالتة ابتدائي','رابعة ابتدائي','خامسة ابتدائي','سادسة ابتدائي'];
+const NA='بدون صف';
+const ak=k=>String(k.age==null?'':k.age).trim();
+const ag=k=>ak(k)||NA;
+const alb=k=>ak(k);
+function ng(v){v=String(v==null?'':v).trim();if(!v)return'';const n=v.replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632);if(/^[1-6]$/.test(n))return GR[+n];if(/حضان|kg/i.test(v))return GR[0];const r=[/اول|أول|إول/,/تان/,/تالت|ثالث/,/رابع/,/خامس/,/سادس/];for(let i=0;i<6;i++)if(r[i].test(v))return GR[i+1];return v}
+const gopts=c=>'<option value="">بدون صف</option>'+GR.map(g=>`<option ${g===c?'selected':''}>${g}</option>`).join('')+(c&&!GR.includes(c)?`<option selected>${esc(c)}</option>`:'');
+let tab='trip',q='',fl='all',sf='';
+const IC={
+trip:'<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+sum:'<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2M3 10h18"/>',
+sv:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-4 3-6 6.5-6s6 2 6.5 6M17 4.5a3.5 3.5 0 010 7M21.5 20c-.3-2.6-1.5-4.4-3.5-5.3"/>',
+kids:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>'};
+const TABS=[['trip','الرحلة'],['sum','الحساب'],['sv','الخدام'],['kids','الأسماء']];
+const hdr=(sub,title,btn)=>`<div class="top"><div><small>${esc(sub)}</small><h2>${esc(title)}</h2></div>${btn||''}</div>`;
+
+function render(){
+ $('nv').innerHTML=TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" onclick="go('${k}')"><svg viewBox="0 0 24 24">${IC[k]}</svg>${l}</button>`).join('');
+ if(tab==='kids')return vNames();
+ if(tab==='sv')return vSv();
+ if(!T())return $('app').innerHTML=hdr('أهلاً','رحلات الكنيسة')+`<div class="card c"><h3 style="justify-content:center">مفيش رحلة لسه</h3><div class="m">اعمل أول رحلة وابدأ حدد مين رايح.</div><button class="btn" onclick="openEdit()">إنشاء رحلة</button></div>`;
+ if(tab==='trip')vTrip();else vSum();
+}
+function go(k){tab=k;render();scrollTo(0,0)}
+
+/* ===== حسابات ===== */
+function kst(t){const go=D.kids.filter(k=>t.subs[k.id]);const paid=go.filter(k=>t.subs[k.id].paid);return{go,paid,unp:go.length-paid.length,no:D.kids.length-go.length,me:go.filter(k=>t.subs[k.id].paid&&t.subs[k.id].sv==='me')}}
+function stages(t){
+ const m={};
+ D.kids.forEach(k=>{const s=t.subs[k.id];if(!s)return;const a=ag(k);const o=m[a]=m[a]||{a,go:0,paid:0};o.go++;if(s.paid)o.paid++});
+ const ix=a=>{const i=GR.indexOf(a);return i<0?(a===NA?99:50):i};
+ return Object.values(m).sort((x,y)=>ix(x.a)-ix(y.a)||x.a.localeCompare(y.a,'ar'));
+}
+function stats(t){
+ const p=t.price||0;
+ const rows=D.sv.map(s=>{const ks=D.kids.filter(k=>t.subs[k.id]&&t.subs[k.id].paid&&t.subs[k.id].sv===s.id);const owed=ks.length*p,got=+(t.got[s.id]||0);return{s,ks,owed,got,rem:owed-got}});
+ const go=D.kids.filter(k=>t.subs[k.id]);
+ return{rows,go,unp:go.filter(k=>!t.subs[k.id].paid)};
+}
+
+/* ===== الرحلة ===== */
+function vTrip(){
+ const t=T();
+ $('app').innerHTML=hdr('الرحلة',t.name,'<button onclick="openEdit()">تعديل</button>')+`<div id="hs"></div>
+ <input id="qs" placeholder="ابحث عن اسم..." value="${esc(q)}" oninput="q=this.value;drawKids()" style="margin-top:0"><div id="kl"></div>`;
+ upd();
+}
+function upd(){drawHero();drawKids()}
+let SG=[];
+function setSf(i){sf=(sf===SG[i]?'':SG[i]);upd()}
+function drawHero(){
+ const t=T(),S=kst(t),pc=S.go.length?Math.round(S.paid.length/S.go.length*100):0,ST=stages(t);SG=ST.map(x=>x.a);
+ const P=[['all','الكل',D.kids.length],['go','رايحين',S.go.length],['paid','دفعوا',S.paid.length],['me','دفعوا ليا',S.me.length],['unp','لسه',S.unp],['no','مش رايحين',S.no]];
+ $('hs').innerHTML=`<div class="card" style="padding:0;overflow:hidden"><div class="stats"><div><b>${S.go.length}</b><span>رايحين</span></div><div><b>${S.paid.length}</b><span>دفعوا</span></div><div><b>${S.unp}</b><span>لسه</span></div></div><div class="bar"><i style="width:${pc}%"></i></div></div>
+ ${ST.length?`<div class="card"><h3>الرايحين حسب الصف <span class="m">اضغط للفلترة</span></h3><div class="stg">${ST.map((s,i)=>`<button class="${sf===s.a?'on':''}" onclick="setSf(${i})"><b>${s.go}</b><span>${esc(s.a)}</span></button>`).join('')}</div></div>`:''}
+ <div class="pills">${P.map(p=>`<button class="${fl===p[0]?'on':''}" onclick="fl='${p[0]}';upd()">${p[1]} ${p[2]}</button>`).join('')}</div>`;
+}
+function drawKids(){
+ const t=T(),qq=q.trim(),s=k=>t.subs[k.id];
+ const f={all:()=>1,go:s,paid:k=>s(k)&&s(k).paid,me:k=>s(k)&&s(k).paid&&s(k).sv==='me',unp:k=>s(k)&&!s(k).paid,no:k=>!s(k)}[fl];
+ if(!D.kids.length)return $('kl').innerHTML='<div class="card c m">مفيش أسماء. ارفعها من تبويب «الأسماء».</div>';
+ const L=D.kids.filter(k=>f(k)&&(!sf||ag(k)===sf)&&(!qq||k.name.includes(qq)));
+ $('kl').innerHTML=L.length?L.map(kc).join(''):'<div class="m c">مفيش نتايج</div>';
+}
+function kc(k){
+ const s=T().subs[k.id],a=alb(k);
+ return `<div class="kc ${s?(s.paid?'ok':'wait'):''}"><div class="kr"><input type="checkbox" class="cb" ${s?'checked':''} onchange="tg('${k.id}',this.checked)">
+ <div class="kn">${esc(k.name)}<div class="st">${esc(a)}${s?'':(a?' · ':'')+'مش رايح'}</div></div>
+ ${s?`<button class="pb ${s.paid?'g':'a'}" onclick="openPay('${k.id}')">${s.paid?esc(svName(s.sv)):'لسه مدفعش'} ▾</button>`:''}</div></div>`;
+}
+function openPay(id){
+ const k=D.kids.find(x=>x.id===id),s=T().subs[id];
+ const row=(sv,l)=>{const cur=sv===''?!s.paid:(s.paid&&s.sv===sv);return `<button class="opt ${cur?'cur':''}" onclick="pay('${id}','${sv}');closeMd()"><span>${esc(l)}</span>${cur?'<b>✓</b>':''}</button>`};
+ $('md').innerHTML=`<div class="sh"><h3 style="margin:4px 4px 2px;font-size:18px">${esc(k.name)}</h3><div class="m" style="margin:0 4px 12px">اختار حالة الدفع</div>${row('','لسه مدفعش')}${D.sv.map(v=>row(v.id,'دفع لـ '+v.name)).join('')}<button class="btn s" onclick="closeMd()">إلغاء</button></div>`;
+ $('md').classList.add('on');
+}
+function tg(id,c){const t=T();if(c)t.subs[id]={paid:false,sv:''};else delete t.subs[id];save();upd()}
+function pay(id,sv){T().subs[id]=sv?{paid:true,sv}:{paid:false,sv:''};save();upd()}
+
+/* ===== تعديل الرحلة ===== */
+function openEdit(){
+ const t=T();
+ $('md').innerHTML=`<div class="sh">
+ ${t?`<div class="card"><h3>تعديل الرحلة</h3><input id="tn" value="${esc(t.name)}" placeholder="اسم الرحلة"><input id="tp" type="number" inputmode="decimal" value="${t.price}" placeholder="السعر للفرد"><button class="btn" onclick="saveTrip()">حفظ</button><button class="btn d" onclick="delTrip()">مسح الرحلة</button></div>`:''}
+ ${D.trips.length?`<div class="card"><h3>رحلاتي</h3><select onchange="D.cur=this.value;save();closeMd();render()">${D.trips.map(x=>`<option value="${x.id}" ${x.id===D.cur?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>`:''}
+ <div class="card"><h3>رحلة جديدة</h3><input id="nn" placeholder="اسم الرحلة"><input id="np" type="number" inputmode="decimal" placeholder="السعر للفرد"><button class="btn g" onclick="addTrip()">إضافة رحلة</button></div>
+ <div class="card"><h3>نسخة احتياطية</h3><div class="m">البيانات محفوظة على التليفون. خد نسخة من وقت للتاني.</div><button class="btn s" onclick="bk()">تحميل نسخة</button><label class="btn s">استرجاع نسخة<input type="file" accept=".json" style="display:none" onchange="rs(event)"></label></div>
+ <div class="card"><h3>مسح كل البيانات</h3><div class="m">بيمسح الأسماء والرحلات والخدام والاشتراكات من التليفون ده.</div><button class="btn d" onclick="wipe()">مسح كل البيانات</button></div>
+ <button class="btn s" onclick="closeMd()">إغلاق</button></div>`;
+ $('md').classList.add('on');
+}
+function closeMd(){$('md').classList.remove('on')}
+function addTrip(){const n=$('nn').value.trim();if(!n)return alert('اكتب اسم الرحلة');const o={id:uid(),name:n,price:+$('np').value||0,subs:{},got:{}};D.trips.push(o);D.cur=o.id;tab='trip';sf='';save();closeMd();render()}
+function saveTrip(){const t=T();t.name=$('tn').value.trim()||t.name;t.price=+$('tp').value||0;save();closeMd();render()}
+function delTrip(){if(!confirm('تمسح الرحلة وكل اشتراكاتها؟'))return;D.trips=D.trips.filter(x=>x.id!==D.cur);D.cur=D.trips[0]?D.trips[0].id:null;save();closeMd();render()}
+function wipe(){if(!confirm('هتمسح كل الأسماء والرحلات والخدام نهائياً. متأكد؟'))return;if(!confirm('آخر تأكيد: مفيش رجوع. تمسح كل حاجة؟'))return;try{localStorage.removeItem(K)}catch(e){}location.reload()}
+function bk(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D)],{type:'application/json'}));a.download='trips-backup.json';a.click()}
+function rs(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const o=JSON.parse(ev.target.result);if(!o.trips||!o.kids||!o.sv)throw 0;if(!confirm('ده هيستبدل البيانات الحالية. كمّل؟'))return;localStorage.setItem(K,JSON.stringify(o));location.reload()}catch(x){alert('الملف غير صالح')}};r.readAsText(f)}
+
+/* ===== الأسماء ===== */
+function vNames(){
+ $('app').innerHTML=hdr('الأسماء',D.kids.length+' طفل')+`
+ <div class="card"><h3>رفع من إكسل</h3><div class="m">أول عمود: الاسم. تاني عمود (اختياري): الصف. المكرر بيتجاهل.</div>
+ <label class="btn">اختار ملف إكسل<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="imp(event)"></label></div>
+ <div class="card"><h3>إضافة طفل</h3><input id="kn" placeholder="الاسم"><div class="row"><select id="ka">${gopts('')}</select><button class="btn g" style="margin:5px 0" onclick="addKid()">إضافة</button></div></div>
+ <div class="card"><input id="qn" placeholder="بحث" oninput="drawNames(this.value)"><div id="nl"></div></div>`;
+ drawNames('');
+}
+function drawNames(v){$('nl').innerHTML=D.kids.filter(k=>k.name.includes(v.trim())).map(k=>`<div class="item"><span class="n">${esc(k.name)}</span><select onchange="setAge('${k.id}',this.value)">${gopts(ak(k))}</select><button class="x" onclick="delKid('${k.id}')">×</button></div>`).join('')||'<div class="m c">مفيش أسماء</div>'}
+function setAge(id,v){const k=D.kids.find(x=>x.id===id);k.age=v;save()}
+function addKid(){const v=$('kn').value.trim();if(!v)return;if(D.kids.some(k=>k.name===v))return alert('الاسم موجود');D.kids.push({id:uid(),name:v,age:$('ka').value});save();vNames()}
+function delKid(id){if(!confirm('تمسح الاسم من كل الرحلات؟'))return;D.kids=D.kids.filter(k=>k.id!==id);D.trips.forEach(t=>delete t.subs[id]);save();drawNames($('qn').value)}
+function imp(e){
+ const f=e.target.files[0];if(!f)return;
+ if(typeof XLSX==='undefined')return alert('محتاج نت لفتح الإكسل');
+ const r=new FileReader();
+ r.onload=ev=>{try{
+  const wb=XLSX.read(ev.target.result,{type:'array'});
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});
+  const by={};D.kids.forEach(k=>by[k.name]=k);let c=0,u=0;
+  rows.forEach((r,i)=>{
+   const v=String(r[0]==null?'':r[0]).trim(),a=ng(r[1]);
+   if(!v)return;
+   if(i===0&&/^(الاسم|الأسماء|اسم|name|names)$/i.test(v))return;
+   if(by[v]){if(a&&!ak(by[v])){by[v].age=a;u++}return}
+   const o={id:uid(),name:v,age:a};D.kids.push(o);by[v]=o;c++;
+  });
+  save();vNames();alert('تمت إضافة '+c+' اسم'+(u?' وتحديث الصف لـ '+u:''));
+ }catch(x){alert('مقدرتش أقرأ الملف')}};
+ r.readAsArrayBuffer(f);e.target.value='';
+}
+
+/* ===== الخدام ===== */
+function vSv(){
+ $('app').innerHTML=hdr('الخدام',D.sv.length+' خادم')+`<div class="card"><h3>إضافة خادم</h3><div class="row"><input id="sn" placeholder="مثلاً: أستاذ مينا"><button class="btn g" style="flex:none;width:90px;margin:5px 0" onclick="addSv()">إضافة</button></div></div>
+ <div class="card">${D.sv.map(s=>`<div class="item"><span class="n">${esc(s.name)}</span>${s.id==='me'?'<span class="tag">أنت</span>':`<button class="x" onclick="delSv('${s.id}')">×</button>`}</div>`).join('')}</div>`;
+}
+function addSv(){const v=$('sn').value.trim();if(!v)return;D.sv.push({id:uid(),name:v});save();vSv()}
+function delSv(id){if(!confirm('تمسح الخادم؟ اللي دفعوا له هيرجعوا «لسه مدفعش».'))return;D.sv=D.sv.filter(s=>s.id!==id);D.trips.forEach(t=>{for(const k in t.subs)if(t.subs[k].sv===id)t.subs[k]={paid:false,sv:''};delete t.got[id]});save();vSv()}
+
+/* ===== الحساب ===== */
+const nlist=ks=>ks.length?`<ol class="nl">${ks.map(k=>`<li>${esc(k.name)}<span>${esc(alb(k))}</span></li>`).join('')}</ol>`:'<div class="m">لسه مفيش.</div>';
+function vSum(){
+ const t=T(),S=stats(t),ST=stages(t),me=S.rows.find(r=>r.s.id==='me'),oth=S.rows.filter(r=>r.s.id!=='me');
+ const all=S.rows.reduce((a,r)=>a+r.owed,0),rem=oth.reduce((a,r)=>a+r.rem,0);
+ let h=hdr('الحساب',t.name)+`<div class="card" style="padding:0"><div class="stats"><div><b>${fm(all)}</b><span>إجمالي المدفوع</span></div><div><b>${fm(me.owed)}</b><span>معايا أنا</span></div><div><b>${fm(rem)}</b><span>لسه عند الخدام</span></div></div></div>
+ <div class="card"><h3>اللي دفعوا ليا <span class="tag">${me.ks.length} طفل — ${fm(me.owed)}</span></h3>${nlist(me.ks)}</div>`;
+ oth.forEach(r=>{
+  if(!r.ks.length&&!r.got)return;
+  h+=`<div class="card"><h3>${esc(r.s.name)} <span class="tag">${r.ks.length} طفل</span></h3>
+  <div class="mo"><div>المطلوب<b>${fm(r.owed)}</b></div><div>استلمت<input type="number" inputmode="decimal" value="${r.got||''}" placeholder="0" onchange="setGot('${r.s.id}',this.value)"></div><div>المتبقي<b style="color:${r.rem>0?'#b4231f':'#2e7d4f'}">${fm(r.rem)}</b></div></div>
+  <details><summary>عرض الأسماء</summary>${nlist(r.ks)}</details></div>`;
+ });
+ h+=`<div class="card"><h3>حسب الصف</h3>${ST.length?`<table class="t"><tr><th>الصف</th><th>رايحين</th><th>دفعوا</th><th>لسه</th></tr>${ST.map(s=>`<tr><td>${esc(s.a)}</td><td><b>${s.go}</b></td><td>${s.paid}</td><td>${s.go-s.paid}</td></tr>`).join('')}<tr><td><b>الإجمالي</b></td><td><b>${S.go.length}</b></td><td><b>${S.go.length-S.unp.length}</b></td><td><b>${S.unp.length}</b></td></tr></table>`:'<div class="m">لسه محدش اتحدد.</div>'}</div>`;
+ h+=`<div class="card"><h3>لسه مدفعوش <span class="tag">${S.unp.length}</span></h3><details><summary>عرض الأسماء</summary>${nlist(S.unp)}</details></div>
+ <div class="card"><h3>تصدير PDF</h3>
+ <button class="btn" onclick="pdfAll()">كل الرايحين</button>
+ <button class="btn" onclick="pdfSv('me')">اللي دفعوا معايا أنا</button>
+ <button class="btn" onclick="pdfOthers()">اللي دفعوا لخدام تانيين</button>
+ <button class="btn" onclick="pdfUnp()">اللي لسه مدفعوش</button>
+ <button class="btn" onclick="pdfStages()">الرايحين حسب الصف</button>
+ <button class="btn" onclick="pdfSum()">ملخص الحساب</button>
+ <div class="m">هيفتح شاشة الطباعة، اختار «حفظ كـ PDF».</div></div>`;
+ $('app').innerHTML=h;
+}
+function setGot(id,v){T().got[id]=+v||0;save();vSum()}
+
+/* ===== PDF ===== */
+function pdf(title,body){$('pa').innerHTML=`<h2 style="text-align:center">${esc(title)}</h2>${body}`;document.body.classList.add('pr');setTimeout(()=>window.print(),150)}
+window.onafterprint=()=>document.body.classList.remove('pr');
+const tbl=(h,r)=>`<table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table>`;
+const stt=(t,k)=>t.subs[k.id].paid?'دفع لـ '+esc(svName(t.subs[k.id].sv)):'لسه مدفعش';
+function pdfAll(){const t=T(),S=stats(t);pdf(t.name+' — الرايحين ('+S.go.length+')',tbl(['#','الاسم','الصف','الحالة'],S.go.map((k,i)=>[i+1,esc(k.name),esc(ak(k)),stt(t,k)])))}
+function pdfSv(id){const t=T(),r=stats(t).rows.find(x=>x.s.id===id);pdf(t.name+' — '+r.s.name+' ('+r.ks.length+')',tbl(['#','الاسم','الصف'],r.ks.map((k,i)=>[i+1,esc(k.name),esc(ak(k))]))+`<p>المطلوب: ${fm(r.owed)}${id==='me'?'':' — المستلم: '+fm(r.got)+' — المتبقي: '+fm(r.rem)}</p>`)}
+function pdfOthers(){const t=T(),S=stats(t);const o=S.go.filter(k=>t.subs[k.id].paid&&t.subs[k.id].sv!=='me');pdf(t.name+' — دفعوا لخدام تانيين ('+o.length+')',tbl(['#','الاسم','الصف','دفع لـ'],o.map((k,i)=>[i+1,esc(k.name),esc(ak(k)),esc(svName(t.subs[k.id].sv))])))}
+function pdfUnp(){const t=T(),S=stats(t);pdf(t.name+' — لسه مدفعوش ('+S.unp.length+')',tbl(['#','الاسم','الصف'],S.unp.map((k,i)=>[i+1,esc(k.name),esc(ak(k))])))}
+function pdfStages(){const t=T(),ST=stages(t),n=ST.reduce((a,s)=>a+s.go,0);pdf(t.name+' — الرايحين حسب الصف',tbl(['الصف','رايحين','دفعوا','لسه'],ST.map(s=>[esc(s.a),s.go,s.paid,s.go-s.paid]))+`<p>الإجمالي: ${n}</p>`)}
+function pdfSum(){const t=T(),S=stats(t);pdf(t.name+' — ملخص الحساب',tbl(['الخادم','العدد','المطلوب','المستلم','المتبقي'],S.rows.filter(r=>r.ks.length||r.got).map(r=>[esc(r.s.name),r.ks.length,fm(r.owed),r.s.id==='me'?'—':fm(r.got),r.s.id==='me'?'—':fm(r.rem)]))+`<p>لسه مدفعوش: ${S.unp.length}</p>`)}
+
+$('md').onclick=e=>{if(e.target.id==='md')closeMd()};
+render();
+</script>
+</body>
+</html>
